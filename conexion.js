@@ -1,5 +1,5 @@
 async function fetchUsuarios() {
-    const response = await fetch('http://localhost:3000/');
+    const response = await fetch('https://api-usuarios-i5sd.onrender.com/');
     const usuarios = await response.json();
     const listaRegistros = document.getElementById('listaRegistros');
     listaRegistros.innerHTML = '';
@@ -12,7 +12,7 @@ async function fetchUsuarios() {
         deleteBtn.className = 'btn btn-danger btn-sm';
         deleteBtn.addEventListener('click', async () => {
             try {
-                const response = await fetch('http://localhost:3000/', {
+                const response = await fetch('https://api-usuarios-i5sd.onrender.com/', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -40,7 +40,7 @@ document.getElementById('agregarBtn').addEventListener('click', async () => {
     
     
     const nombre = document.getElementById('nombre').value;
-    const response = await fetch('http://localhost:3000/', {
+    const response = await fetch('https://api-usuarios-i5sd.onrender.com/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
