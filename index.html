@@ -1,51 +1,38 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuarios</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Registro de Usuarios</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="formulario">
-                            <div class="form-group">
-                                <label for="id">ID</label>
-                                <input type="text" class="form-control" id="id" name="id" placeholder="ID" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="nombre">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre"
-                                    required>
-                            </div>
-                            <button type="button" class="btn btn-primary btn-block" id="agregarBtn">Agregar</button>
-                        </form>
-                        <button class="btn btn-secondary btn-block mt-3" id="verUsuariosBtn">Ver Usuarios</button>
-                        <ul class="list-group mt-3" id="listaRegistros"></ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap and jQuery JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Usuarios</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="./conexion.js">
-
-    </script>
+</head>
+<body>
+    <form class="formulario" id="formulario" >
+        <h2 class="formulario__title">Usuarios</h2>
+        <input class="formulario__input" id="Usuario" type="text" placeholder="Juan" required>
+        <button class="formulario__button" id="btnFormulario" >Crear Usuario</button>
+    </form>
+   
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="Usuarios" id="datosTabla">
+            <tr>
+                <td >
+                    Origaska
+                </td>
+                <td>
+                    <button class="btn" onclick="editar(999,'origaska')">Editar</button>
+                    <button class="btn-2">Eliminar </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script src="conexion.js"></script>
 </body>
-
 </html>

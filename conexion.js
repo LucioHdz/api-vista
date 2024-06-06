@@ -1,72 +1,150 @@
-async function fetchUsuarios() {
-    const response = await fetch('https://api-usuarios-i5sd.onrender.com/');
-    const usuarios = await response.json();
-    const listaRegistros = document.getElementById('listaRegistros');
-    listaRegistros.innerHTML = '';
-    usuarios.forEach(usuario => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.textContent = `${usuario.id}: ${usuario.nombre}`;
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Eliminar';
-        deleteBtn.className = 'btn btn-danger btn-sm';
-        deleteBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('https://api-usuarios-i5sd.onrender.com/', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id: usuario.id })
-                });
-                if (response.ok) {
-                    alert('Usuario eliminado');
-                    li.remove();
-                } else {
-                    const errorData = await response.json();
-                    alert('Error al eliminar el usuario: ' + errorData.message);
-                }
-            } catch (error) {
-                console.error('Error al eliminar el usuario:', error);
-                alert('Error al eliminar el usuario');
-            }
-        });
-        li.appendChild(deleteBtn);
-        listaRegistros.appendChild(li);
-    });
-}
+    const inputUsuario = document.getElementById("Usuario");
+    const formulario = document.getElementById("formulario");
+    const tabla = document.getElementById("datosTabla");
+    const btnFormulario = document.getElementById("btnFormulario");
 
-document.getElementById('agregarBtn').addEventListener('click', async () => {
-    
-    
-    const nombre = document.getElementById('nombre').value;
-    const response = await fetch('https://api-usuarios-i5sd.onrender.com/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: 0, nombre })
-    });
-    const result = await response.json();
-    if (response.ok) {
-        Swal.fire({
-            icon: "success",
-            title: "Usuario Agregado",
-            text:"se agrego a la base de datos",
-            showConfirmButton: true,
-            showCancelButton: true,
-            cancelButtonText: "No permitir",
-            cancelButtonColor:"#FF6663",
-            confirmButtonText:"Enterado",
-            footer:"<h1>mensaje</h1>",
-            theme:"dark"
+    const URL = "https://api-usuarios-i5sd.onrender.com/";
+    var estadoFormulario = true; //si es verdadero agrega, si es falso edita
+    var idUsuaroEditado = null;
+
+    const mostrarUsuarios = async () => {
+        const usuariosRaw = await fetch(URL);
+        const listaUsuarios = await usuariosRaw.json();
+        var componentes = "";
+        listaUsuarios.map((usuario) => {
+            const componenteUsuario = `
+            <tr>
+                <td>${usuario.nombre}</td>
+                <td>
+                <button class="btn" onclick='editar(${usuario.id},"${usuario.nombre}")'>Editar</button>
+                <button class="btn-2" onclick='eliminar(${usuario.id})'>Eliminar </button>
+                </td>
+            </tr>
+            `;
+            componentes += componenteUsuario;
         });
-        document.getElementById('id').value = '';
-        document.getElementById('nombre').value = '';
-        fetchUsuarios();
-    } else {
-        alert('Error al agregar el usuario: ' + result.message);
+        tabla.innerHTML = componentes;
     }
-});
 
-document.getElementById('verUsuariosBtn').addEventListener('click', fetchUsuarios);
+    const editar = (id, usuario) => {
+        estadoFormulario = false;
+        idUsuaroEditado = id;
+        inputUsuario.value = usuario;
+        btnFormulario.innerText = "Editar Usuario";
+    }
+
+    const eliminar = (id) => {
+        Swal.fire({
+            title: "¿Estás seguro de eliminar el usuario?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#000",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, estoy seguro",
+            cancelButtonText: "Cancelar"
+          }).then( async(result) => {
+            if (result.isConfirmed) {
+                
+                const resultado = await fetch(URL,{
+                    method:"DELETE",
+                    headers:{
+                        "Content-type": "application/json"
+                    },
+                    body:JSON.stringify({id})
+                });
+                if (resultado.status ==200){   
+                    Swal.fire({
+                        title: "Eliminado!",
+                        text: "El usuario se elimino correctamente",
+                        icon: "success"
+                    });
+                    mostrarUsuarios();
+                }
+            }
+          });
+    }
+
+    const guardarUsuario = async (usuario)=>{
+        const resultados = await fetch(URL, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ nombre: usuario })
+        });
+        if (resultados.status == 200) {
+            //todo correcto
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Usuario Guardado",
+                showConfirmButton: false,
+                timer: 1500
+              });
+              mostrarUsuarios();
+        } else {
+            //cocurrio un error
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Usuario No guardado",
+                showConfirmButton: false,
+                timer: 1500
+              });
+        }
+    }
+
+    const editarUsuario = async (usuario)=>{
+        const usuarioEditado = {
+            id: idUsuaroEditado,
+            nombre: usuario
+        }
+
+        const respuesta = await fetch(URL,{
+            method:"PATCH",
+            headers:{
+                "Content-type": "application/json"
+            },
+            body:JSON.stringify(usuarioEditado)
+        });
+
+        if (respuesta.status == 200){
+            inputUsuario.value = "";
+            btnFormulario.innerText = "Crear Usuario";
+            estadoFormulario = true;
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Usuario Editado",
+                showConfirmButton: false,
+                timer: 1500
+              });
+              mostrarUsuarios();
+        }else{
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "No se pudo realizar el cambio",
+                showConfirmButton: false,
+                timer: 1500
+              });
+        }
+
+
+    }
+
+    const eventoFormulario = (e) => {
+        e.preventDefault();
+        const usuario = inputUsuario.value;
+        if (estadoFormulario){
+            guardarUsuario(usuario);
+        }else{
+            editarUsuario(usuario);
+        }
+
+    }
+
+
+    mostrarUsuarios();
+
+    formulario.addEventListener("submit", eventoFormulario);
